@@ -3,6 +3,17 @@
         <div class="card-header">{{response.table.toUpperCase()}}</div>
 
         <div class="card-body">
+
+            <div class="row">
+                <div class="form-group col-md-10">
+                    <label for="filter">Quick search</label>
+                    <input type="text" id="filter" class="form-control" v-model="quickSearchQuery">
+                </div>
+                <div class="form-group col-md-2">
+
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
@@ -52,7 +63,8 @@
                 sort: {
                     key: 'id',
                     order: 'asc'
-                }
+                },
+                quickSearchQuery: ''
             }
         },
 
@@ -63,6 +75,18 @@
         computed: {
             filteredRecords () {
                 let data = this.response.records;
+
+                //filter quick search
+                // return array filtered by row
+                data = data.filter((row)=> {
+                    // sort row keys on some condition
+                    return Object.keys(row).some((key) => {
+                        // compare string value of row key with comparison of quickSearchQuery
+                        return String(row[key]).toLowerCase().indexOf(this.quickSearchQuery.toLowerCase()) > -1
+                    })
+                });
+
+                // filter by column
                 if (this.sort.key) {
                     data = _.orderBy(data, (i) => {
                         let value = i[this.sort.key];
