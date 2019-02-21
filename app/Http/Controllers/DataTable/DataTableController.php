@@ -31,18 +31,29 @@ abstract class DataTableController extends Controller
             'data' =>  [
                 'table' => $this->builder->getModel()->getTable(),
                 'displayable' => $this->getDisplayableColumns(),
+                'updatable' => $this->getUpdatableColumns(),
                 'records' => $this->getRecords($request),
             ]
         ]);
     }
 
+    public function update ($id, Request $request) {
+        $this->builder->find($id)->update($request->only($this->getUpdatableColumns()));
+    }
+
     protected function getRecords (Request $request) {
-        return $this->builder->limit($request->limit)->get($this->getDisplayableColumns());
+        return $this->builder->limit($request->limit)->orderBy('id', 'asc')->get($this->getDisplayableColumns());
     }
 
     public function getDisplayableColumns() {
         return array_values(array_diff($this->getDatabaseColumnNames(), $this->builder->getModel()->getHidden()));
     }
+
+    public function getUpdatableColumns() {
+        return $this->getDisplayableColumns();
+    }
+
+
     protected function getDatabaseColumnNames ()  {
         return Schema::getColumnListing($this->builder->getModel()->getTable());
     }
