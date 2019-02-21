@@ -22,6 +22,8 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
     Route::get('/users', 'UserController@index');
+    Route::get('/plans', 'PlanController@index');
 });
 
 Route::resource('/datatable/users', 'DataTable\UserController');
+Route::resource('/datatable/plans', 'DataTable\PlanController');
