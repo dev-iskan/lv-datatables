@@ -4,6 +4,7 @@ namespace App\Http\Controllers\DataTable;
 
 use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
 abstract class DataTableController extends Controller
@@ -22,20 +23,21 @@ abstract class DataTableController extends Controller
     }
 
     /**
+     * @param Request $request
      * @return Illuminate\Http\JsonResponse
      */
-    public function index () {
+    public function index (Request $request) {
         return response()->json([
             'data' =>  [
                 'table' => $this->builder->getModel()->getTable(),
                 'displayable' => $this->getDisplayableColumns(),
-                'records' => $this->getRecords(),
+                'records' => $this->getRecords($request),
             ]
         ]);
     }
 
-    protected function getRecords () {
-        return $this->builder->get($this->getDisplayableColumns());
+    protected function getRecords (Request $request) {
+        return $this->builder->limit($request->limit)->get($this->getDisplayableColumns());
     }
 
     public function getDisplayableColumns() {
