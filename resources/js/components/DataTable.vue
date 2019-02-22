@@ -3,7 +3,34 @@
         <div class="card-header">{{response.table.toUpperCase()}}</div>
 
         <div class="card-body">
-
+            <form action="" @submit.prevent="getRecords">
+                <label for="search">Search</label>
+                <div class="row row-fluid">
+                    <div class="form-group col-md-3">
+                        <select class="form-control" v-model="search.column">
+                            <option :value="column" v-for="column in response.displayable">
+                                {{column}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <select class="form-control" v-model="search.operator">
+                            <option value="equals">=</option>
+                            <option value="contains">contains</option>
+                            <option value="starts_with">starts with</option>
+                            <option value="ends_with">end with</option>
+                            <option value="greater_than"> > </option>
+                            <option value="less_than"> < </option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6 input-group">
+                        <input type="text" id="search" class="form-control" v-model="search.value">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="submit">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
             <div class="row">
                 <div class="form-group col-md-10">
                     <label for="filter">Quick search</label>
@@ -97,6 +124,11 @@
 
                     },
                     errors: []
+                },
+                search: {
+                    value: '',
+                    operator: 'equals',
+                    column: 'id'
                 }
             }
         },
@@ -146,7 +178,8 @@
 
             getQueryParameters () {
                 return queryString.stringify({
-                    limit: this.limit
+                    limit: this.limit,
+                    ...this.search
                 })
             },
 
