@@ -38090,7 +38090,7 @@ var render = function() {
               on: {
                 click: function($event) {
                   $event.preventDefault()
-                  _vm.creating.active = true
+                  _vm.creating.active = !_vm.creating.active
                 }
               }
             },
@@ -38131,7 +38131,13 @@ var render = function() {
                         _c(
                           "label",
                           { staticClass: "col-md-2", attrs: { for: column } },
-                          [_vm._v(_vm._s(column))]
+                          [
+                            _vm._v(
+                              _vm._s(
+                                _vm.response.custom_columns[column] || column
+                              )
+                            )
+                          ]
                         ),
                         _vm._v(" "),
                         _c("div", { staticClass: "col-md-6" }, [
@@ -38430,7 +38436,11 @@ var render = function() {
                           }
                         }
                       },
-                      [_vm._v(_vm._s(column))]
+                      [
+                        _vm._v(
+                          _vm._s(_vm.response.custom_columns[column] || column)
+                        )
+                      ]
                     ),
                     _vm._v(" "),
                     _vm.sort.key === column

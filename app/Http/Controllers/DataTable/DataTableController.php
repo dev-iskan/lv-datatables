@@ -36,6 +36,7 @@ abstract class DataTableController extends Controller
                 'allow' => [
                     'creation' => $this->allowCreation
                 ],
+                'custom_columns' => $this->getCustomColumnNames(),
                 'records' => $this->getRecords($request),
             ]
         ]);
@@ -43,6 +44,10 @@ abstract class DataTableController extends Controller
 
     public function update ($id, Request $request) {
         $this->builder->find($id)->update($request->only($this->getUpdatableColumns()));
+    }
+
+    public function getCustomColumnNames () {
+        return [];
     }
 
     /**

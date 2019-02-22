@@ -2,7 +2,7 @@
     <div class="card card-default">
         <div class="card-header">
             {{response.table.toUpperCase()}}
-            <a href="#" class="float-right" @click.prevent="creating.active = true" v-if="response.allow.creation">
+            <a href="#" class="float-right" @click.prevent="creating.active = !creating.active" v-if="response.allow.creation">
                 {{creating.active ? 'Cancel' : 'New record'}}
             </a>
         </div>
@@ -12,7 +12,7 @@
                 <div class="card-body">
                     <form action="" @submit.prevent="store">
                         <div class="form-group row justify-content-md-center" v-for="column in response.updatable">
-                            <label :for="column" class="col-md-2">{{ column }}</label>
+                            <label :for="column" class="col-md-2">{{ response.custom_columns[column] || column }}</label>
                             <div class="col-md-6">
                                 <input type="text" :id="column" class="form-control" :class="{'is-invalid': creating.errors[column]}" v-model="creating.form[column]">
 
@@ -78,7 +78,7 @@
                     <thead>
                     <tr>
                         <th scope="col" v-for="column in response.displayable">
-                            <span class="sortable" @click="sortBy(column)">{{column}}</span>
+                            <span class="sortable" @click="sortBy(column)">{{response.custom_columns[column] || column}}</span>
                             <div class="arrow" v-if="sort.key === column"
                                  :class="{
                                     'arrow--asc' : sort.order === 'asc',

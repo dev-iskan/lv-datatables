@@ -40,4 +40,11 @@ class UserController extends DataTableController
             'email'
         ];
     }
+
+    public function getCustomColumnNames () {
+        return [
+            'name' => 'Full Name',
+            'email' => 'Email Address'
+        ];
+    }
 }
