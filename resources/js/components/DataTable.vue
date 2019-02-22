@@ -1,8 +1,34 @@
 <template>
     <div class="card card-default">
-        <div class="card-header">{{response.table.toUpperCase()}}</div>
+        <div class="card-header">
+            {{response.table.toUpperCase()}}
+            <a href="#" class="float-right" @click.prevent="creating.active = true" v-if="response.allow.creation">
+                {{creating.active ? 'Cancel' : 'New record'}}
+            </a>
+        </div>
 
         <div class="card-body">
+            <div class="card card-default" v-if="creating.active">
+                <div class="card-body">
+                    <form action="" @submit.prevent="store">
+                        <div class="form-group row justify-content-md-center" v-for="column in response.updatable">
+                            <label :for="column" class="col-md-2">{{ column }}</label>
+                            <div class="col-md-6">
+                                <input type="text" :id="column" class="form-control" :class="{'is-invalid': creating.errors[column]}" v-model="creating.form[column]">
+
+                                <div class="invalid-feedback" v-if="creating.errors[column]">
+                                    {{creating.errors[column][0]}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6 offset-md-4">
+                                <button type="submit" class="btn btn-primary">Create</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
             <form action="" @submit.prevent="getRecords">
                 <label for="search">Search</label>
                 <div class="row row-fluid">
@@ -110,6 +136,9 @@
                 response: {
                     table: '',
                     displayable: [],
+                    allow: {
+                        creation: null
+                    },
                     records: []
                 },
                 sort: {
@@ -129,6 +158,11 @@
                     value: '',
                     operator: 'equals',
                     column: 'id'
+                },
+                creating: {
+                    active: false,
+                    form: {},
+                    errors: []
                 }
             }
         },
@@ -208,7 +242,27 @@
                         })
                     })
                     .catch((error) => {
-                        this.editing.errors = error.response.data.errors
+                        if (error.response.status === 422 ) {
+                            this.editing.errors = error.response.data.errors
+                        }
+
+                    })
+            },
+
+            store () {
+                axios.post(`${this.endpoint}`, this.creating.form)
+                    .then(() => {
+                        return this.getRecords()
+                     })
+                    .then(() => {
+                        this.creating.active = false
+                        this.creating.form = {}
+                        this.creating.errors = []
+                    })
+                    .catch((error) => {
+                        if (error.response.status === 422 ) {
+                            this.creating.errors = error.response.data.errors
+                        }
                     })
             }
         }

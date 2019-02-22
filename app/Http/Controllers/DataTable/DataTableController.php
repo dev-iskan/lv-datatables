@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Schema;
 abstract class DataTableController extends Controller
 {
     protected $builder;
-
+    protected $allowCreation = true;
     abstract public function builder();
 
     public function __construct(){
@@ -33,6 +33,9 @@ abstract class DataTableController extends Controller
                 'table' => $this->builder->getModel()->getTable(),
                 'displayable' => $this->getDisplayableColumns(),
                 'updatable' => $this->getUpdatableColumns(),
+                'allow' => [
+                    'creation' => $this->allowCreation
+                ],
                 'records' => $this->getRecords($request),
             ]
         ]);
@@ -40,6 +43,18 @@ abstract class DataTableController extends Controller
 
     public function update ($id, Request $request) {
         $this->builder->find($id)->update($request->only($this->getUpdatableColumns()));
+    }
+
+    /**
+     * @param Request $request
+     */
+
+    public function store (Request $request) {
+        if(!$this->allowCreation) {
+            return;
+        }
+
+        $this->builder->create($request->only($this->getUpdatableColumns()));
     }
 
     protected function getRecords (Request $request) {

@@ -1866,6 +1866,32 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
@@ -1879,6 +1905,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       response: {
         table: '',
         displayable: [],
+        allow: {
+          creation: null
+        },
         records: []
       },
       sort: {
@@ -1896,6 +1925,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         value: '',
         operator: 'equals',
         column: 'id'
+      },
+      creating: {
+        active: false,
+        form: {},
+        errors: []
       }
     };
   },
@@ -1967,7 +2001,24 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           _this3.editing.form = {};
         });
       }).catch(function (error) {
-        _this3.editing.errors = error.response.data.errors;
+        if (error.response.status === 422) {
+          _this3.editing.errors = error.response.data.errors;
+        }
+      });
+    },
+    store: function store() {
+      var _this4 = this;
+
+      axios.post("".concat(this.endpoint), this.creating.form).then(function () {
+        return _this4.getRecords();
+      }).then(function () {
+        _this4.creating.active = false;
+        _this4.creating.form = {};
+        _this4.creating.errors = [];
+      }).catch(function (error) {
+        if (error.response.status === 422) {
+          _this4.creating.errors = error.response.data.errors;
+        }
       });
     }
   }
@@ -38027,10 +38078,114 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "card card-default" }, [
     _c("div", { staticClass: "card-header" }, [
-      _vm._v(_vm._s(_vm.response.table.toUpperCase()))
+      _vm._v(
+        "\n        " + _vm._s(_vm.response.table.toUpperCase()) + "\n        "
+      ),
+      _vm.response.allow.creation
+        ? _c(
+            "a",
+            {
+              staticClass: "float-right",
+              attrs: { href: "#" },
+              on: {
+                click: function($event) {
+                  $event.preventDefault()
+                  _vm.creating.active = true
+                }
+              }
+            },
+            [
+              _vm._v(
+                "\n            " +
+                  _vm._s(_vm.creating.active ? "Cancel" : "New record") +
+                  "\n        "
+              )
+            ]
+          )
+        : _vm._e()
     ]),
     _vm._v(" "),
     _c("div", { staticClass: "card-body" }, [
+      _vm.creating.active
+        ? _c("div", { staticClass: "card card-default" }, [
+            _c("div", { staticClass: "card-body" }, [
+              _c(
+                "form",
+                {
+                  attrs: { action: "" },
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      return _vm.store($event)
+                    }
+                  }
+                },
+                [
+                  _vm._l(_vm.response.updatable, function(column) {
+                    return _c(
+                      "div",
+                      {
+                        staticClass: "form-group row justify-content-md-center"
+                      },
+                      [
+                        _c(
+                          "label",
+                          { staticClass: "col-md-2", attrs: { for: column } },
+                          [_vm._v(_vm._s(column))]
+                        ),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "col-md-6" }, [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.creating.form[column],
+                                expression: "creating.form[column]"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            class: {
+                              "is-invalid": _vm.creating.errors[column]
+                            },
+                            attrs: { type: "text", id: column },
+                            domProps: { value: _vm.creating.form[column] },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(
+                                  _vm.creating.form,
+                                  column,
+                                  $event.target.value
+                                )
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _vm.creating.errors[column]
+                            ? _c("div", { staticClass: "invalid-feedback" }, [
+                                _vm._v(
+                                  "\n                                " +
+                                    _vm._s(_vm.creating.errors[column][0]) +
+                                    "\n                            "
+                                )
+                              ])
+                            : _vm._e()
+                        ])
+                      ]
+                    )
+                  }),
+                  _vm._v(" "),
+                  _vm._m(0)
+                ],
+                2
+              )
+            ])
+          ])
+        : _vm._e(),
+      _vm._v(" "),
       _c(
         "form",
         {
@@ -38174,7 +38329,7 @@ var render = function() {
                 }
               }),
               _vm._v(" "),
-              _vm._m(0)
+              _vm._m(1)
             ])
           ])
         ]
@@ -38433,6 +38588,20 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("div", { staticClass: "col-md-6 offset-md-4" }, [
+        _c(
+          "button",
+          { staticClass: "btn btn-primary", attrs: { type: "submit" } },
+          [_vm._v("Create")]
+        )
+      ])
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
