@@ -6,6 +6,7 @@
 
                 <div class="card-body">
                     <user v-for="user in users" :key="user.id" :user="user"></user>
+                    <pagination :meta="meta" @pagination:switched="getUsers"></pagination>
                 </div>
             </div>
         </div>
@@ -14,6 +15,7 @@
 
 <script>
     import User from './partials/User'
+    import Pagination from '../pagination/Pagination'
     export default {
         props: {
             endpoint: {
@@ -22,18 +24,30 @@
             }
         },
         components: {
-            User
+            User,
+            Pagination
         },
         data () {
             return {
-                users: []
+                users: [],
+                meta: {}
             }
         },
         created () {
-            axios.get(`${this.endpoint}`)
-                .then((response) => {
-                    this.users = response.data.data
+            this.getUsers()
+        },
+        methods: {
+            getUsers (page=1) {
+                axios.get(`${this.endpoint}`, {
+                    params: {
+                        page
+                    }
                 })
+                    .then((response) => {
+                        this.users = response.data.data
+                        this.meta = response.data.meta
+                    })
+            }
         }
     }
 </script>
