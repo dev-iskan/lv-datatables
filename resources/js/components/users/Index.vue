@@ -6,7 +6,7 @@
 
                 <div class="card-body">
                     <user v-for="user in users" :key="user.id" :user="user"></user>
-                    <pagination :meta="meta" @pagination:switched="getUsers"></pagination>
+                    <pagination v-if="meta.current_page" :meta="meta" @pagination:switched="switchPage "></pagination>
                 </div>
             </div>
         </div>
@@ -17,12 +17,6 @@
     import User from './partials/User'
     import Pagination from '../pagination/Pagination'
     export default {
-        props: {
-            endpoint: {
-                required: true,
-                type: String
-            }
-        },
         components: {
             User,
             Pagination
@@ -33,12 +27,17 @@
                 meta: {}
             }
         },
+        watch: {
+            '$route.query' (query) {
+                this.getUsers(query.page)
+            }
+        },
         created () {
             this.getUsers()
         },
         methods: {
-            getUsers (page=1) {
-                axios.get(`${this.endpoint}`, {
+            getUsers (page=this.$route.query.page) {
+                axios.get(`/api/users`, {
                     params: {
                         page
                     }
@@ -47,6 +46,14 @@
                         this.users = response.data.data
                         this.meta = response.data.meta
                     })
+            },
+            switchPage (page) {
+                this.$router.replace({
+                    name:'users.index',
+                    query: {
+                        page
+                    }
+                })
             }
         }
     }
