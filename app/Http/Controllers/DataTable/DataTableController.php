@@ -12,6 +12,7 @@ abstract class DataTableController extends Controller
 {
     protected $builder;
     protected $allowCreation = true;
+    protected $allowDeletion = false;
     abstract public function builder();
 
     public function __construct(){
@@ -34,7 +35,8 @@ abstract class DataTableController extends Controller
                 'displayable' => $this->getDisplayableColumns(),
                 'updatable' => $this->getUpdatableColumns(),
                 'allow' => [
-                    'creation' => $this->allowCreation
+                    'creation' => $this->allowCreation,
+                    'deletion' => $this->allowCreation
                 ],
                 'custom_columns' => $this->getCustomColumnNames(),
                 'records' => $this->getRecords($request),
@@ -44,6 +46,13 @@ abstract class DataTableController extends Controller
 
     public function update ($id, Request $request) {
         $this->builder->find($id)->update($request->only($this->getUpdatableColumns()));
+    }
+
+    public function destroy ($ids, Request $request) {
+        if(!$this->allowDeletion) {
+            return;
+        }
+        $this->builder->whereIn('id', explode(',', $ids))->delete();
     }
 
     public function getCustomColumnNames () {

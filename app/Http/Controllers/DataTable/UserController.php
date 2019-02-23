@@ -13,6 +13,8 @@ class UserController extends DataTableController
         return User::query();
     }
 
+    protected $allowDeletion = true;
+
     public function update ($id, Request $request) {
         $this->validate($request, [
             'email' => ['required', 'string', 'email', 'max:250',
